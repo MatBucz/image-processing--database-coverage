@@ -1,0 +1,7 @@
+version: '3'
+services:
+  opencv:
+    build: .
+    command: ["python3", "/app/main.py"]
+    volumes:
+      - .:/app

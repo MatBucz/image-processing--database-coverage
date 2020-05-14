@@ -6,4 +6,4 @@ if __name__ == "__main__":
 
     db = DatabaseMetrics(DB_SRC, OUTPUT)
     db.calculate_si_cf()
-    db.si_cf_plane()
+    db.plot_all()

@@ -8,29 +8,43 @@ import seaborn as sns
 from matplotlib import rc
 
 
-def describe_figure(filename, title, xlabel, ylabel):
+FIG_SIZE = (6, 6)
+XLIM = 165
+YLIM = 170
+
+
+def describe_figure(filename, xlabel: str, ylabel: str, title: str = None):
     def decorator(func):
         def wrapper(obj):
+            plt.figure(figsize=FIG_SIZE)
             func(obj)
-            plt.title(title)
+            plt.title(title if title is not None else obj.label)
             plt.xlabel(xlabel)
             plt.ylabel(ylabel)
+            plt.xlim(0, XLIM)
+            plt.ylim(0, YLIM)
             plt.tight_layout()
-            plt.savefig(obj.output_dir + filename, bbox_inches='tight')
+            plt.savefig(f"{obj.output_dir}{obj.label}_{filename}", bbox_inches='tight')
+
         return wrapper
+
     return decorator
 
+
 class DatabaseMetrics:
-    def __init__(self, directory: str, output_dir: str):
+    def __init__(self, directory: str, output_dir: str, label: str = ""):
 
         self.it = ImageCollection(directory)
         self.output_dir = output_dir
+        self.label = label
         self.si = list()
         self.cf = list()
+        self.points = None
+        self.calculate_si_cf()
+        print(self)
         sns.set(style="white")
         rc('font', **{'size': 36, 'family': 'serif', 'serif': ['Computer Modern']})
         rc('text', usetex=True)
-
 
     def plot_all(self):
         self.plot_si_cf_plane()
@@ -43,35 +57,27 @@ class DatabaseMetrics:
             si, cf = im.calculate_si_cf()
             self.si.append(si)
             self.cf.append(cf)
+        self.points = np.vstack((self.cf, self.si)).T
 
-    @describe_figure("si_cf_plane.png", "SI x CF plane", "Spatial Information", "Colorfullness")
-    def plot_si_cf_plane(self, filename: str = "si_cf.png"):
-        if not len(self.cf) or not len(self.si):
-            self.calculate_si_cf()
-        plt.clf()
+    @describe_figure("si_cf_plane.png", "Colorfulness", "Spatial Information")
+    def plot_si_cf_plane(self):
         sns.scatterplot(self.cf, self.si)
 
-    @describe_figure("convex_hull.png", "Convex Hull", "Spatial Information", "Colorfullness")
+    @describe_figure("convex_hull.png", "Colorfulness", "Spatial Information")
     def plot_convex_hull(self):
-        points = np.vstack((self.cf, self.si)).T
-        hull = ConvexHull(points)
-        plt.clf()
-        plt.plot(points[:, 0], points[:, 1], 'o')
+        hull = ConvexHull(self.points)
+        plt.plot(self.points[:, 0], self.points[:, 1], 'o')
         for simplex in hull.simplices:
-            plt.plot(points[simplex, 0], points[simplex, 1], 'k-')
+            plt.plot(self.points[simplex, 0], self.points[simplex, 1], 'k-')
 
-    @describe_figure("delaunay.png", "Delaunay triangulation", "Spatial Information", "Colorfullness")
+    @describe_figure("delaunay.png", "Colorfulness", "Spatial Information")
     def plot_delaunay(self):
-        points = np.vstack((self.cf, self.si)).T
-        tri = Delaunay(points)
-
-        fig, ax = plt.subplots(1, 1)
-        plt.tight_layout()
-        ax.triplot(points[:, 0], points[:, 1], tri.simplices.copy(), lw=1)
-
-        hull = ConvexHull(points)
+        hull = ConvexHull(self.points)
         for simplex in hull.simplices:
-            ax.plot(points[simplex, 0], points[simplex, 1], 'r-')
+            plt.plot(self.points[simplex, 0], self.points[simplex, 1], 'r-')
+
+        tri = Delaunay(self.points)
+        plt.triplot(self.points[:, 0], self.points[:, 1], tri.simplices.copy(), lw=1)
 
     def __str__(self):
         return f"SI: {self.si}, CF: {self.cf}"

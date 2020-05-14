@@ -23,11 +23,13 @@ class ImageIterator:
 class ImageCollection:
     def __init__(self, directory: str):
         if not isdir(directory):
-            raise ImageIteratorInputError("Provided path is not directory")
+            raise ImageIteratorInputError(f"Provided path is not directory '{directory}'")
         self.files = [f for f in listdir(directory) if isfile(join(directory, f))]
         if not len(self.files):
-            raise ImageIteratorInputError("Provided path does not contain files")
+            raise ImageIteratorInputError(f"Provided path does not contain files '{directory}'")
         self.directory = directory
+        if not self.directory.endswith("/"):
+            self.directory += "/"
 
     def __iter__(self):
         return ImageIterator(self)

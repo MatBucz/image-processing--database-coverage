@@ -1,17 +1,26 @@
+"""Tools for handling multiple images in the DB"""
+
 from os import listdir
 from os.path import isfile, join, isdir
 
 
 class ImageIteratorInputError(Exception):
-    pass
+    """Image Iterator Error raised on wrong input params"""
 
 
 class ImageIterator:
-    def __init__(self, image_collection):
+    """Iterator class for getting all images"""
+
+    def __init__(self, image_collection) -> None:
+        """Iterator init"""
         self._image_collection = image_collection
         self._index = 0
 
-    def __next__(self):
+    def __next__(self) -> str:
+        """
+        Next image
+        :return: filename with path of the DB
+        """
         if self._index < len(self._image_collection.files):
             result = (
                 self._image_collection.directory
@@ -23,7 +32,13 @@ class ImageIterator:
 
 
 class ImageCollection:
-    def __init__(self, directory: str):
+    """Collection of images in the database based on iterator"""
+
+    def __init__(self, directory: str) -> None:
+        """
+        Create image collection
+        :param directory: path to the DB directory
+        """
         if not isdir(directory):
             raise ImageIteratorInputError(
                 f"Provided path is not directory '{directory}'"
@@ -37,5 +52,9 @@ class ImageCollection:
         if not self.directory.endswith("/"):
             self.directory += "/"
 
-    def __iter__(self):
+    def __iter__(self) -> ImageIterator:
+        """
+        Iterator
+        :return: Image iterator
+        """
         return ImageIterator(self)

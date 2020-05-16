@@ -1,14 +1,23 @@
+"""Processing for single image in the DB"""
+from typing import Tuple
+
 import cv2
 import numpy as np
 import logging
 
 
 class ImageMetricsInputError(Exception):
-    pass
+    """Image Metrics Error raised on wrong input params"""
 
 
 class ImageMetrics:
-    def __init__(self, img_filename):
+    """Class for calculating metrics for single image in the database"""
+
+    def __init__(self, img_filename: str) -> None:
+        """
+        Create ImageMetrics for specific image file
+        :param img_filename: path and filename of the image file
+        """
         logging.debug(f"Loading {img_filename}")
         if not isinstance(img_filename, str) or not len(img_filename):
             raise ImageMetricsInputError("Provide valid filename")
@@ -16,7 +25,20 @@ class ImageMetrics:
         if self.img is None:
             raise ImageMetricsInputError("Loaded image is None")
 
-    def calculate_spatial_information(self):
+    def calculate_si_cf(self) -> Tuple[float, float]:
+        """
+        Calculates both Spatial Information and Colorfulnes for input image
+        :return: tuple of SI and CF
+        """
+        si = self.__calculate_spatial_information()
+        cf = self.__calculate_colorfulness()
+        return si, cf
+
+    def __calculate_spatial_information(self) -> float:
+        """
+        Calculates spatial information for input image
+        :return: Spatial Information value
+        """
         si_rgb = [0] * 3
         for d in range(self.img.shape[2]):
             sobelx = cv2.Sobel(self.img[:, :, d], cv2.CV_64F, 1, 0, ksize=3)
@@ -29,7 +51,11 @@ class ImageMetrics:
         si = 0.299 * si_rgb[2] + 0.587 * si_rgb[1] + 0.114 * si_rgb[0]
         return si
 
-    def calculate_colorfulness(self):
+    def __calculate_colorfulness(self) -> float:
+        """
+        Calculates Colorfulness for input image
+        :return: Colorfulness value
+        """
         rg = self.img[:, :, 2].astype("float") - self.img[:, :, 1].astype("float")
         yb = 0.5 * (
             self.img[:, :, 2].astype("float") + self.img[:, :, 1].astype("float")
@@ -44,8 +70,3 @@ class ImageMetrics:
             mu_rg ** 2 + mu_yb ** 2
         )
         return cf
-
-    def calculate_si_cf(self):
-        si = self.calculate_spatial_information()
-        cf = self.calculate_colorfulness()
-        return si, cf

@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  python: circleci/python@0.2.1
+  python: circleci/python@0.3.0
 
 jobs:
   build-and-test:
@@ -10,8 +10,7 @@ jobs:
       - checkout
       - python/load-cache
       - python/install-deps:
-          parameters:
-            dependency-file: requirements-dev.txt
+          dependency-file: requirements-dev.txt
       - python/save-cache
       - run:
           command: |

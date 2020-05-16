@@ -1,5 +1,11 @@
+install-dev:
+	pip3 install -r requirements-dev.txt
+
 run:
-	docker-compose up
+	python3 main.py
+
+test:
+	pytest tests
 
 montage:
 	montage  -geometry +1+1 -tile 2x2 output/*_delaunay.png output/delaunay_montage.png

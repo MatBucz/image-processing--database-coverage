@@ -1,5 +1,5 @@
 """Metrics processing for single DB"""
-from app.image_collection import ImageCollection
+from app.image_collection import ImageCollection, ImageIteratorInputError
 from app.image_metrics import ImageMetrics
 from matplotlib import pyplot as plt
 from scipy.spatial import ConvexHull
@@ -14,20 +14,28 @@ XLIM = 165
 YLIM = 170
 
 
+class DatabaseMetricsError(Exception):
+    """Generic database metrics error"""
+
+
 def describe_figure(filename, xlabel: str, ylabel: str, title: str = None):
     """Handles common figure processing for different plots: labels, limits, titles, etc"""
 
     def decorator(func):
         def wrapper(obj):
-            plt.figure(figsize=FIG_SIZE)
-            func(obj)
-            plt.title(title if title is not None else obj.label)
-            plt.xlabel(xlabel)
-            plt.ylabel(ylabel)
-            plt.xlim(0, XLIM)
-            plt.ylim(0, YLIM)
-            plt.tight_layout()
-            plt.savefig(f"{obj.output_dir}{obj.label}_{filename}", bbox_inches="tight")
+            if obj.output_dir is not None:
+                plt.figure(figsize=FIG_SIZE)
+                func(obj)
+                plt.title(title if title is not None else obj.label)
+                plt.xlabel(xlabel)
+                plt.ylabel(ylabel)
+                plt.xlim(0, XLIM)
+                plt.ylim(0, YLIM)
+                plt.tight_layout()
+
+                plt.savefig(
+                    f"{obj.output_dir}{obj.label}_{filename}", bbox_inches="tight"
+                )
 
         return wrapper
 
@@ -44,7 +52,10 @@ class DatabaseMetrics:
         :param output_dir: directory in which output images should be saved
         :param label: DB label used in plot titles
         """
-        self.it = ImageCollection(directory)
+        try:
+            self.it = ImageCollection(directory)
+        except ImageIteratorInputError as err:
+            raise DatabaseMetricsError(f"Error during creating ImageCollection '{err}'")
         self.output_dir = output_dir
         self.label = label
         self.si = list()

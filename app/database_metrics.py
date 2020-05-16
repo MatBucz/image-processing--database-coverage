@@ -24,7 +24,7 @@ def describe_figure(filename, xlabel: str, ylabel: str, title: str = None):
             plt.xlim(0, XLIM)
             plt.ylim(0, YLIM)
             plt.tight_layout()
-            plt.savefig(f"{obj.output_dir}{obj.label}_{filename}", bbox_inches='tight')
+            plt.savefig(f"{obj.output_dir}{obj.label}_{filename}", bbox_inches="tight")
 
         return wrapper
 
@@ -43,8 +43,8 @@ class DatabaseMetrics:
         self.calculate_si_cf()
         print(self)
         sns.set(style="white")
-        rc('font', **{'size': 36, 'family': 'serif', 'serif': ['Computer Modern']})
-        rc('text', usetex=True)
+        rc("font", **{"size": 36, "family": "serif", "serif": ["Computer Modern"]})
+        rc("text", usetex=True)
 
     def plot_all(self):
         self.plot_si_cf_plane()
@@ -66,15 +66,15 @@ class DatabaseMetrics:
     @describe_figure("convex_hull.png", "Colorfulness", "Spatial Information")
     def plot_convex_hull(self):
         hull = ConvexHull(self.points)
-        plt.plot(self.points[:, 0], self.points[:, 1], 'o')
+        plt.plot(self.points[:, 0], self.points[:, 1], "o")
         for simplex in hull.simplices:
-            plt.plot(self.points[simplex, 0], self.points[simplex, 1], 'k-')
+            plt.plot(self.points[simplex, 0], self.points[simplex, 1], "k-")
 
     @describe_figure("delaunay.png", "Colorfulness", "Spatial Information")
     def plot_delaunay(self):
         hull = ConvexHull(self.points)
         for simplex in hull.simplices:
-            plt.plot(self.points[simplex, 0], self.points[simplex, 1], 'r-')
+            plt.plot(self.points[simplex, 0], self.points[simplex, 1], "r-")
 
         tri = Delaunay(self.points)
         plt.triplot(self.points[:, 0], self.points[:, 1], tri.simplices.copy(), lw=1)

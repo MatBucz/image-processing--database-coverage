@@ -14,6 +14,10 @@ jobs:
       - python/save-cache
       - run:
           command: |
+            interrogate -v app
+          name: Run docstring analysis
+      - run:
+          command: |
             coverage run --source app -m pytest tests
             coverage report --skip-empty --fail-under=50
           name: Run tests

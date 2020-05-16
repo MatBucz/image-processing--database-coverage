@@ -11,7 +11,7 @@ class TestImageCollection(TestCase):
             "tests/assets/test_db/lena.png",
         ]
         image_list = [img for img in ic]
-        self.assertListEqual(image_list, expected_images)
+        self.assertCountEqual(image_list, expected_images)
 
     def test_should_raise_exception_on_wrong_dir(self):
         with self.assertRaises(ImageIteratorInputError):

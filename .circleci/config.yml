@@ -9,11 +9,14 @@ jobs:
     steps:
       - checkout
       - python/load-cache
-      - python/install-deps
+      - python/install-deps:
+          dependency-file: requirements-dev.txt
       - python/save-cache
       - run:
-          command: coverage run  --source app -m pytest tests
-          name: Test
+          command: |
+            coverage run --source app -m pytest tests
+            coverage report --skip-empty --fail-under=50
+          name: Run tests
 
 workflows:
   main:

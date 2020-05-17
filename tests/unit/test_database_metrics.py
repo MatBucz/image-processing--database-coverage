@@ -6,7 +6,7 @@ from app.database_metrics import DatabaseMetrics, DatabaseMetricsError
 class TestDatabaseMetrics(TestCase):
     def setUp(self) -> None:
         self.dm = DatabaseMetrics(
-            "tests/assets/test_db", "", (112.02, 85.83), "test db"
+            "tests/assets/test_db", None, (112.02, 85.83), "test db"
         )
 
     def test_should_plot_all(self):

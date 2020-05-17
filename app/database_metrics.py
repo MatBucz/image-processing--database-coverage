@@ -1,5 +1,5 @@
 """Metrics processing for single DB"""
-from typing import List, Optional
+from typing import List
 
 import numpy as np
 import seaborn as sns
@@ -60,7 +60,7 @@ class DatabaseMetrics:
         self.label = label
         self.si: List[float] = list()
         self.cf: List[float] = list()
-        self.points: Optional[np.ndarray] = None
+        self.points: np.ndarray = None
         self.__calculate_si_cf()
         print(self)
         sns.set(style="white")

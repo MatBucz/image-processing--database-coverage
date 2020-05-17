@@ -6,4 +6,4 @@ coverage>=5.1
 pre-commit>=2.4.0
 isort>=4.3.21
 flake8>=3.8.1
-mypy>=0.770
+flake8-mypy>=17.8.0

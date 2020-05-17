@@ -1,6 +1,6 @@
 """Metrics processing for single DB"""
 import os
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
 import seaborn as sns
@@ -46,11 +46,18 @@ def describe_figure(filename, xlabel: str, ylabel: str, title: str = None):
 class DatabaseMetrics:
     """Class for calculating various metrics for single DB"""
 
-    def __init__(self, directory: str, output_dir: str, label: str = "") -> None:
+    def __init__(
+        self,
+        directory: str,
+        output_dir: str,
+        max_si_cf: Tuple[float, float],
+        label: str = "",
+    ) -> None:
         """
         DatabaseMetrics constructor
         :param directory: path to the DB
         :param output_dir: directory in which output images should be saved
+        :param max_si_cf: Maximum values of SI and CF across all analyzed databases
         :param label: DB label used in plot titles
         """
         try:
@@ -62,11 +69,21 @@ class DatabaseMetrics:
         self.si: List[float] = list()
         self.cf: List[float] = list()
         self.points: np.ndarray = None
+        self.max_si, self.max_cf = max_si_cf
         self.__calculate_si_cf()
-        print(self)
+
         sns.set(style="white")
         rc("font", **{"size": 36, "family": "serif", "serif": ["Computer Modern"]})
         rc("text", usetex=True)
+
+    def get_max_si_cf(self) -> Tuple[float, float]:
+        """
+        Returns maximum value of Spatial Information and Colorfulness for current DB
+        :return: Tuple (max_si, max_cf)
+        """
+        max_si = np.amax(self.si)
+        max_cf = np.amax(self.cf)
+        return max_si, max_cf
 
     def plot_all(self) -> None:
         """

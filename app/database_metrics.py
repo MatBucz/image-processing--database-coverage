@@ -1,4 +1,5 @@
 """Metrics processing for single DB"""
+import os
 from typing import List
 
 import numpy as np
@@ -9,9 +10,9 @@ from matplotlib import pyplot as plt
 from matplotlib import rc
 from scipy.spatial import ConvexHull, Delaunay
 
-FIG_SIZE = (6, 6)
-XLIM = 165
-YLIM = 170
+FIG_SIZE = (int(os.getenv("FIGURE_XSIZE", 6)), int(os.getenv("FIGURE_YSIZE", 6)))
+XLIM = int(os.getenv("FIGURE_XLIM", 165))
+YLIM = int(os.getenv("FIGURE_YLIM", 170))
 
 
 class DatabaseMetricsError(Exception):

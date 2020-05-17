@@ -1,11 +1,7 @@
 FROM jjanzic/docker-python3-opencv
 
-COPY requirements.txt /requirements.txt
-
-RUN pip install -r /requirements.txt
 RUN apt-get update && apt-get install -y font-manager
 RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
-
 
 # ---------
 RUN echo "deb http://httpredir.debian.org/debian buster main contrib non-free" > /etc/apt/sources.list \
@@ -30,3 +26,6 @@ RUN apt-get install -y dvipng texlive-latex-extra texlive-fonts-recommended  cm-
 RUN fc-cache -f -v
 
 RUN rm /.cache/matplotlib -fr
+
+COPY requirements.txt /requirements.txt
+RUN pip install -r /requirements.txt

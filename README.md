@@ -5,11 +5,44 @@
 
 This project provides set of tools allowing to analyze coverage of the image database.
 
+It calculates set of metrics, which allow to compare how wide range of images the database covers.
+
+Input images should be divided into several directories - i.e. images from each database
+should have their own directory:
+
+```
+parent_dir
+│
+└───detabase 1
+│   │   image1.png
+│   │   image2.png
+│   │   ...
+│
+└───database 2
+│   │   imageA.png
+│   │   imageB.png
+│   │   ...
+│
+│   ...
+│
+└───database N
+    │   imageX.png
+    │   imageY.png
+    │   imageZ.png
+    │   ...
+```
+
 ## Usage
 
-Taking advantage of docker environment simply use:
+Install requirements and run main.py:
 ```shell script
-make run
+pip3 install -r requirements-dev.txt
+python3 main.py
+```
+
+Or using docker environment:
+```shell script
+docker-compose up
 ```
 
 ## Test dataset

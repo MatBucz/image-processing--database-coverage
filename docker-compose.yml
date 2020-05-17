@@ -3,5 +3,7 @@ services:
   opencv:
     build: .
     command: ["python3", "/app/main.py"]
+    env_file:
+      - .env
     volumes:
       - .:/app

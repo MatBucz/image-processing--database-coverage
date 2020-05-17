@@ -1,5 +1,4 @@
 """Processing for single image in the DB"""
-import logging
 from typing import Tuple
 
 import cv2
@@ -18,7 +17,6 @@ class ImageMetrics:
         Create ImageMetrics for specific image file
         :param img_filename: path and filename of the image file
         """
-        logging.debug(f"Loading {img_filename}")
         if not isinstance(img_filename, str) or not len(img_filename):
             raise ImageMetricsInputError("Provide valid filename")
         self.img = cv2.imread(img_filename)

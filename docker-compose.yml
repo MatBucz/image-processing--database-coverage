@@ -4,6 +4,6 @@ services:
     build: .
     command: ["python3", "/app/main.py"]
     env_file:
-      - .env
+      - local.env
     volumes:
       - .:/app

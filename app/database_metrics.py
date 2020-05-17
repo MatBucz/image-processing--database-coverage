@@ -1,13 +1,13 @@
 """Metrics processing for single DB"""
+from typing import List, Optional
+
+import numpy as np
+import seaborn as sns
 from app.image_collection import ImageCollection, ImageIteratorInputError
 from app.image_metrics import ImageMetrics
 from matplotlib import pyplot as plt
-from scipy.spatial import ConvexHull
-from scipy.spatial import Delaunay
-import numpy as np
-import seaborn as sns
 from matplotlib import rc
-
+from scipy.spatial import ConvexHull, Delaunay
 
 FIG_SIZE = (6, 6)
 XLIM = 165
@@ -19,7 +19,7 @@ class DatabaseMetricsError(Exception):
 
 
 def describe_figure(filename, xlabel: str, ylabel: str, title: str = None):
-    """Handles common figure processing for different plots: labels, limits, titles, etc"""
+    """Handles common figure processiflang for different plots: labels, limits, titles, etc"""
 
     def decorator(func):
         def wrapper(obj):
@@ -58,9 +58,9 @@ class DatabaseMetrics:
             raise DatabaseMetricsError(f"Error during creating ImageCollection '{err}'")
         self.output_dir = output_dir
         self.label = label
-        self.si = list()
-        self.cf = list()
-        self.points = None
+        self.si: List[float] = list()
+        self.cf: List[float] = list()
+        self.points: Optional[np.ndarray] = None
         self.__calculate_si_cf()
         print(self)
         sns.set(style="white")

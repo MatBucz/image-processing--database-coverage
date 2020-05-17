@@ -1,7 +1,7 @@
 """Tools for handling multiple images in the DB"""
 
 from os import listdir
-from os.path import isfile, join, isdir
+from os.path import isdir, isfile, join
 
 
 class ImageIteratorInputError(Exception):

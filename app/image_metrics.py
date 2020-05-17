@@ -1,9 +1,9 @@
 """Processing for single image in the DB"""
+import logging
 from typing import Tuple
 
 import cv2
 import numpy as np
-import logging
 
 
 class ImageMetricsInputError(Exception):

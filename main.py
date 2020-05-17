@@ -1,10 +1,9 @@
 """Runs analysis for several databases provided in DB_SRC env var and stores results in OUTPUT dir"""
-import logging
 import math
 import os
 from typing import List
 
-from app.database_metrics import DatabaseMetrics
+from app.database_metrics import DatabaseMetrics, DatabaseMetricsError
 
 DB_SRC = os.getenv("DB_SRC", "./example_dataset/")
 OUTPUT = os.getenv("OUTPUT", "./output/")
@@ -31,7 +30,7 @@ if __name__ == "__main__":
     if not math.isclose(MAX_SI, max_si, rel_tol=1e-03) or not math.isclose(
         MAX_CF, max_cf, rel_tol=1e-03
     ):
-        logging.warning(
+        raise DatabaseMetricsError(
             f"Make sure your env MAX_SI and MAX_CF values are set according to the:\n"
             f"Max SI value: {max_si}, Max CF value: {max_cf}\n"
             f"Provided SI:  {MAX_SI}, provided CF:  {MAX_CF}"

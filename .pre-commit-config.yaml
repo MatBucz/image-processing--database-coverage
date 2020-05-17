@@ -9,7 +9,7 @@ repos:
     rev: 1.1.4
     hooks:
       - id: interrogate
-        args: [--fail-under=80, -v, -M, -e, 'tests', '.']
+        args: [--fail-under=80, -v, -M, -p, -r, '[tT]est*', '.']
 
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.7.9

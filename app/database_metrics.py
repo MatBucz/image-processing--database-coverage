@@ -1,6 +1,6 @@
 """Metrics processing for single DB"""
 import os
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 import seaborn as sns
@@ -49,7 +49,7 @@ class DatabaseMetrics:
     def __init__(
         self,
         directory: str,
-        output_dir: str,
+        output_dir: Optional[str],
         max_si_cf: Tuple[float, float],
         label: str = "",
     ) -> None:
@@ -68,9 +68,12 @@ class DatabaseMetrics:
         self.label = label
         self.si: List[float] = list()
         self.cf: List[float] = list()
-        self.points: np.ndarray = None
-        self.max_si, self.max_cf = max_si_cf
-        self.__calculate_si_cf()
+        self.norm_si: List[float] = list()
+        self.norm_cf: List[float] = list()
+        self.max_db_si, self.max_db_cf = max_si_cf
+        self.points, self.norm_points = self.__calculate_si_cf()
+        self.hull = ConvexHull(self.points)
+        self.norm_hull = ConvexHull(self.norm_points)
 
         sns.set(style="white")
         rc("font", **{"size": 36, "family": "serif", "serif": ["Computer Modern"]})
@@ -85,6 +88,32 @@ class DatabaseMetrics:
         max_cf = np.amax(self.cf)
         return max_si, max_cf
 
+    def get_si_cf_ranges(self) -> Tuple[float, float]:
+        """
+        Calculates SI and CF relative ranges
+        :return: Tuple of (SI, CF) relative ranges
+        """
+        si_range = self.__get_range(self.si, self.max_db_si)
+        cf_range = self.__get_range(self.cf, self.max_db_cf)
+        return si_range, cf_range
+
+    @staticmethod
+    def __get_range(values: List[float], maximum: float) -> float:
+        """
+        Calculates relative ranges
+        :param values: list of values to calculate relative ranges
+        :param maximum: global maximum across multiple DBs
+        :return: relative range
+        """
+        return (max(values) - min(values)) / maximum
+
+    def get_coverage_area(self) -> float:
+        """
+        Calculates normalized convex hull area
+        :return: Convex Hull area
+        """
+        return self.norm_hull.volume
+
     def plot_all(self) -> None:
         """
         Top-level method for generating all plots for the DB
@@ -93,7 +122,7 @@ class DatabaseMetrics:
         self.__plot_convex_hull()
         self.__plot_delaunay()
 
-    def __calculate_si_cf(self) -> None:
+    def __calculate_si_cf(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Creates list of SI and CF for each image in the DB
         """
@@ -102,7 +131,12 @@ class DatabaseMetrics:
             si, cf = im.calculate_si_cf()
             self.si.append(si)
             self.cf.append(cf)
-        self.points = np.vstack((self.cf, self.si)).T
+            self.norm_si.append(si / self.max_db_si)
+            self.norm_cf.append(cf / self.max_db_cf)
+        return (
+            np.vstack((self.cf, self.si)).T,
+            np.vstack((self.norm_cf, self.norm_si)).T,
+        )
 
     @describe_figure("si_cf_plane.png", "Colorfulness", "Spatial Information")
     def __plot_si_cf_plane(self) -> None:
@@ -112,16 +146,14 @@ class DatabaseMetrics:
     @describe_figure("convex_hull.png", "Colorfulness", "Spatial Information")
     def __plot_convex_hull(self) -> None:
         """Plots Convex Hull for SIxCF plane"""
-        hull = ConvexHull(self.points)
         plt.plot(self.points[:, 0], self.points[:, 1], "o")
-        for simplex in hull.simplices:
+        for simplex in self.hull.simplices:
             plt.plot(self.points[simplex, 0], self.points[simplex, 1], "k-")
 
     @describe_figure("delaunay.png", "Colorfulness", "Spatial Information")
     def __plot_delaunay(self) -> None:
         """Plots Delaunay triangulation for SIxCF plane"""
-        hull = ConvexHull(self.points)
-        for simplex in hull.simplices:
+        for simplex in self.hull.simplices:
             plt.plot(self.points[simplex, 0], self.points[simplex, 1], "r-")
 
         tri = Delaunay(self.points)

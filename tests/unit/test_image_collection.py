@@ -9,6 +9,7 @@ class TestImageCollection(TestCase):
         expected_images = [
             "tests/assets/test_db/fruits.png",
             "tests/assets/test_db/lena.png",
+            "tests/assets/test_db/baboon.png",
         ]
         image_list = [img for img in ic]
         self.assertCountEqual(image_list, expected_images)

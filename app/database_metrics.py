@@ -1,4 +1,5 @@
 """Metrics processing for single DB"""
+import math
 import os
 from typing import List, Optional, Tuple
 
@@ -112,7 +113,7 @@ class DatabaseMetrics:
         Calculates normalized convex hull area
         :return: Convex Hull area
         """
-        return self.norm_hull.volume
+        return math.sqrt(self.norm_hull.volume)
 
     def plot_all(self) -> None:
         """
@@ -120,6 +121,7 @@ class DatabaseMetrics:
         """
         self.__plot_si_cf_plane()
         self.__plot_convex_hull()
+        self.__plot_fixed_radius()
         self.__plot_delaunay()
 
     def __calculate_si_cf(self) -> Tuple[np.ndarray, np.ndarray]:
@@ -147,6 +149,15 @@ class DatabaseMetrics:
     def __plot_convex_hull(self) -> None:
         """Plots Convex Hull for SIxCF plane"""
         plt.plot(self.points[:, 0], self.points[:, 1], "o")
+        for simplex in self.hull.simplices:
+            plt.plot(self.points[simplex, 0], self.points[simplex, 1], "k-")
+
+    @describe_figure("fixed_radius.png", "Colorfulness", "Spatial Information")
+    def __plot_fixed_radius(self, radius: float = 60) -> None:
+        """Plots Convex Hull with fixed radius method for SIxCF plane"""
+        radius *= 72.0 / plt.gcf().dpi
+        plt.plot(self.points[:, 0], self.points[:, 1], "o", markersize=radius)
+        plt.plot(self.points[:, 0], self.points[:, 1], "yx")
         for simplex in self.hull.simplices:
             plt.plot(self.points[simplex, 0], self.points[simplex, 1], "k-")
 

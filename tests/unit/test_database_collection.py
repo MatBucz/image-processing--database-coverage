@@ -1,10 +1,6 @@
 from unittest import TestCase
 
-# fmt: off
-from app.database_collection import (DatabaseCollection,
-                                     DatabaseIteratorInputError)
-
-# fmt: on
+from app.database_collection import DatabaseCollection, DatabaseIteratorInputError
 
 
 class TestDatabaseCollection(TestCase):

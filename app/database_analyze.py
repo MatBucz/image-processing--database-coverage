@@ -1,7 +1,7 @@
 """Tools for calculating metrics for multiple DBs"""
 import logging
 import os
-from typing import Dict
+from typing import Dict, Optional
 
 import pandas as pd
 import seaborn as sns
@@ -17,7 +17,7 @@ class DatabaseAnalyzeError(Exception):
 
 
 class DatabaseAnalyze:
-    def __init__(self, parent_dir: str, output: str):
+    def __init__(self, parent_dir: str, output: Optional[str] = None):
         logging.debug(
             f"DatabaseAnalyze init for dir: '{parent_dir}' and output: '{output}'"
         )
@@ -34,6 +34,10 @@ class DatabaseAnalyze:
         self.dc = DatabaseCollection(self.parent_dir)
 
         self.db_metric: Dict[str, DatabaseMetrics] = dict()
+
+        self.df = pd.DataFrame(
+            columns=["Uniformity", "Relative ranges", "Metric", "Database", "Area"]
+        )
 
         self.__get_max_si_cf()
         logging.debug(f"Max SI: '{self.max_si}', Max CF: '{self.max_cf}'")
@@ -64,48 +68,60 @@ class DatabaseAnalyze:
             )
             self.db_metric[db].plot_all()
         self.__uniformity()
+        self.__relative_ranges()
+        self.__convex_hull_area()
 
     def __relative_ranges(self):
-        si_rr: Dict[str, float] = dict()
-        cf_rr: Dict[str, float] = dict()
         for db in self.dc:
-            si_rr[db], cf_rr[db] = self.db_metric[db].get_si_cf_ranges()
-        plt.bar(range(len(si_rr)), list(si_rr.values()), align="center")
-        plt.xticks(range(len(si_rr)), list(si_rr.keys()))
-        plt.show()
+            si_rr, cf_rr = self.db_metric[db].get_si_cf_ranges()
+            self.df = self.df.append(
+                {"Relative ranges": si_rr, "Metric": "SI", "Database": db},
+                ignore_index=True,
+            )
+            self.df = self.df.append(
+                {"Relative ranges": cf_rr, "Metric": "CF", "Database": db},
+                ignore_index=True,
+            )
+        self.__double_bar("Relative ranges")
 
     def __convex_hull_area(self):
-        area: Dict[str, float] = dict()
         for db in self.dc:
-            area[db] = self.db_metric[db].get_coverage_area()
-        self.__single_bar(area)
+            area = self.db_metric[db].get_coverage_area()
+            self.df = self.df.append({"Area": area, "Database": db}, ignore_index=True)
+        self.__single_bar("Area")
 
     def __uniformity(self):
-        si_uni: Dict[str, float] = dict()
-        cf_uni: Dict[str, float] = dict()
         for db in self.dc:
-            si_uni[db] = entropy(self.db_metric[db].si, base=10)
-            cf_uni[db] = entropy(self.db_metric[db].cf, base=10)
-        self.__double_bar(si_uni, cf_uni)
+            si_uni = entropy(self.db_metric[db].si, base=10)
+            cf_uni = entropy(self.db_metric[db].cf, base=10)
+            self.df = self.df.append(
+                {"Uniformity": si_uni, "Metric": "SI", "Database": db},
+                ignore_index=True,
+            )
+            self.df = self.df.append(
+                {"Uniformity": cf_uni, "Metric": "CF", "Database": db},
+                ignore_index=True,
+            )
+        self.__double_bar("Uniformity")
 
-    @staticmethod
-    def __single_bar(values: Dict[str, float]):
-        plt.bar(range(len(values)), list(values.values()), align="center")
-        plt.xticks(range(len(values)), list(values.keys()))
-        plt.show()
-
-    def __double_bar(self, values_a: Dict[str, float], values_b: Dict[str, float]):
-        d = {
-            "SI": list(values_a.values()),
-            "CF": list(values_b.values()),
-            "Database": list(values_a.keys()),
-        }
-        data = pd.DataFrame.from_dict(d)
-
-        df = pd.melt(data, id_vars="Database", var_name="Metric", value_name="val")
-        ax = sns.barplot(x="Database", y="val", hue="Metric", data=df)
+    def __single_bar(self, y):
+        plt.clf()
+        self.df = self.df.sort_values(by=y, ascending=False)
+        ax = sns.barplot(x="Database", y=y, data=self.df)
         plt.ylim(0, 1)
         plt.ylabel(None)
-        plt.title("Test")
-        fig = ax.get_figure()
-        fig.savefig(self.output + "test.png")
+        plt.title(y)
+        if self.output is not None:
+            fig = ax.get_figure()
+            fig.savefig(self.output + f"{y}.png")
+
+    def __double_bar(self, y):
+        plt.clf()
+        self.df = self.df.sort_values(by=y, ascending=False)
+        ax = sns.barplot(x="Database", y=y, hue="Metric", data=self.df)
+        plt.ylim(0, 1)
+        plt.ylabel(None)
+        plt.title(y)
+        if self.output is not None:
+            fig = ax.get_figure()
+            fig.savefig(self.output + f"{y}.png")

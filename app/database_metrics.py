@@ -179,6 +179,8 @@ class DatabaseMetrics:
         :param radius: radius of the circle representing single image
         :return: fill rate factor [0-1]
         """
+        context_usetex = rcParams["text.usetex"]
+        rc("text", usetex=False)
 
         fig, ax = plt.subplots()
         plt.figure(figsize=(self.PRECISION, self.PRECISION))
@@ -201,7 +203,7 @@ class DatabaseMetrics:
 
         full = np.where(array_without_points > 128, 0, 1)
         diff = np.where(diff <= 128, 0, 1)
-
+        rc("text", usetex=context_usetex)
         return min(np.sum(diff) / np.sum(full), 1.0)
 
     def __plot_convex_hull_for_fill_rate(self, ax, p, radius, zorder):
@@ -214,10 +216,7 @@ class DatabaseMetrics:
 
     @staticmethod
     def __canvas_to_rgb(canvas):
-        context_usetex = rcParams["text.usetex"]
-        rc("text", usetex=False)
         canvas.draw()
-        rc("text", usetex=context_usetex)
         array = np.array(canvas.renderer.buffer_rgba()).copy()
         return np.delete(array, 3, 2)  # Remove alpha
 

@@ -36,7 +36,14 @@ class DatabaseAnalyze:
         self.db_metric: Dict[str, DatabaseMetrics] = dict()
 
         self.df = pd.DataFrame(
-            columns=["Uniformity", "Relative ranges", "Metric", "Database", "Area"]
+            columns=[
+                "Uniformity",
+                "Relative ranges",
+                "Metric",
+                "Database",
+                "Area",
+                "Fill rate",
+            ]
         )
 
         self.__get_max_si_cf()
@@ -67,6 +74,7 @@ class DatabaseAnalyze:
                 self.parent_dir + db, self.output, (self.max_si, self.max_cf), db
             )
             self.db_metric[db].plot_all()
+        self.__fill_rate_factor()
         self.__uniformity()
         self.__relative_ranges()
         self.__convex_hull_area()
@@ -89,6 +97,14 @@ class DatabaseAnalyze:
             area = self.db_metric[db].get_coverage_area()
             self.df = self.df.append({"Area": area, "Database": db}, ignore_index=True)
         self.__single_bar("Area")
+
+    def __fill_rate_factor(self):
+        for db in self.dc:
+            fill_rate = self.db_metric[db].calculate_fill_rate_fixed_radius_area()
+            self.df = self.df.append(
+                {"Fill rate": fill_rate, "Database": db}, ignore_index=True
+            )
+        self.__single_bar("Fill rate")
 
     def __uniformity(self):
         for db in self.dc:

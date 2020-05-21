@@ -9,6 +9,8 @@ from app.image_collection import ImageCollection, ImageIteratorInputError
 from app.image_metrics import ImageMetrics
 from matplotlib import pyplot as plt
 from matplotlib import rc
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.patches import Polygon
 from scipy.spatial import ConvexHull, Delaunay
 
 FIG_SIZE = (int(os.getenv("FIGURE_XSIZE", 6)), int(os.getenv("FIGURE_YSIZE", 6)))
@@ -38,6 +40,7 @@ def describe_figure(filename, xlabel: str, ylabel: str, title: str = None):
                 plt.savefig(
                     f"{obj.output_dir}{obj.label}_{filename}", bbox_inches="tight"
                 )
+                plt.close()
 
         return wrapper
 
@@ -46,6 +49,8 @@ def describe_figure(filename, xlabel: str, ylabel: str, title: str = None):
 
 class DatabaseMetrics:
     """Class for calculating various metrics for single DB"""
+
+    PRECISION = 40
 
     def __init__(
         self,
@@ -160,6 +165,64 @@ class DatabaseMetrics:
         plt.plot(self.points[:, 0], self.points[:, 1], "yx")
         for simplex in self.hull.simplices:
             plt.plot(self.points[simplex, 0], self.points[simplex, 1], "k-")
+
+    def calculate_fill_rate_fixed_radius_area(self, radius: float = 60) -> float:
+        """
+        Calculates fill rate factor i.e. how well do images fill the convex hull using fixed radius approach
+        This calculation is based on numerical approach, where ratio two areas is computed.
+        One is area of circles inside convex hull and the other is convex hull area.
+        Area of circles inside convex hull is computed as follows:
+        One plot contains solid polygon representing convex hull and the other is reduced by points of given radius
+        representing images in the database.
+        The difference of these two plots is equivalent to points inside convex hull.
+
+        :param radius: radius of the circle representing single image
+        :return: fill rate factor [0-1]
+        """
+        fig, ax = plt.subplots()
+        plt.figure(figsize=(self.PRECISION, self.PRECISION))
+        canvas = FigureCanvasAgg(fig)
+        fig.patch.set_visible(False)
+        ax.axis("off")
+
+        radius *= 72.0 / fig.dpi
+        p = Polygon(self.hull.points[self.hull.vertices], True, color="k")
+
+        ax.add_patch(p)
+        ax.plot(
+            self.points[:, 0], self.points[:, 1], "wo", markersize=radius, zorder=10
+        )
+        canvas.draw()
+        array_with_points = np.array(canvas.renderer.buffer_rgba()).copy()
+
+        ax.clear()
+        ax.axis("off")
+
+        ax.add_patch(p)
+        ax.plot(
+            self.points[:, 0], self.points[:, 1], "wo", markersize=radius, zorder=00
+        )
+
+        canvas.draw()
+        array_without_points = np.array(canvas.renderer.buffer_rgba()).copy()
+
+        plt.close()
+
+        array_with_points = self.__remove_alpha_channel(array_with_points)
+        array_without_points = self.__remove_alpha_channel(array_without_points)
+
+        diff = np.absolute(
+            array_with_points.astype("float") - array_without_points.astype("float")
+        ).astype("uint8")
+
+        full = np.where(array_without_points > 128, 0, 1)
+        diff = np.where(diff <= 128, 0, 1)
+
+        return min(np.sum(diff) / np.sum(full), 1.0)
+
+    @staticmethod
+    def __remove_alpha_channel(array):
+        return np.delete(array, 3, 2)
 
     @describe_figure("delaunay.png", "Colorfulness", "Spatial Information")
     def __plot_delaunay(self) -> None:

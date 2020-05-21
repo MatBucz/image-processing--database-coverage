@@ -8,7 +8,7 @@ import seaborn as sns
 from app.image_collection import ImageCollection, ImageIteratorInputError
 from app.image_metrics import ImageMetrics
 from matplotlib import pyplot as plt
-from matplotlib import rc
+from matplotlib import rc, rcParams
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.patches import Polygon
 from scipy.spatial import ConvexHull, Delaunay
@@ -179,37 +179,21 @@ class DatabaseMetrics:
         :param radius: radius of the circle representing single image
         :return: fill rate factor [0-1]
         """
+
         fig, ax = plt.subplots()
         plt.figure(figsize=(self.PRECISION, self.PRECISION))
         canvas = FigureCanvasAgg(fig)
         fig.patch.set_visible(False)
-        ax.axis("off")
 
         radius *= 72.0 / fig.dpi
         p = Polygon(self.hull.points[self.hull.vertices], True, color="k")
 
-        ax.add_patch(p)
-        ax.plot(
-            self.points[:, 0], self.points[:, 1], "wo", markersize=radius, zorder=10
-        )
-        canvas.draw()
-        array_with_points = np.array(canvas.renderer.buffer_rgba()).copy()
-
-        ax.clear()
-        ax.axis("off")
-
-        ax.add_patch(p)
-        ax.plot(
-            self.points[:, 0], self.points[:, 1], "wo", markersize=radius, zorder=00
-        )
-
-        canvas.draw()
-        array_without_points = np.array(canvas.renderer.buffer_rgba()).copy()
+        self.__plot_convex_hull_for_fill_rate(ax, p, radius, 10)
+        array_with_points = self.__canvas_to_rgb(canvas)
+        self.__plot_convex_hull_for_fill_rate(ax, p, radius, 0)
+        array_without_points = self.__canvas_to_rgb(canvas)
 
         plt.close()
-
-        array_with_points = self.__remove_alpha_channel(array_with_points)
-        array_without_points = self.__remove_alpha_channel(array_without_points)
 
         diff = np.absolute(
             array_with_points.astype("float") - array_without_points.astype("float")
@@ -220,9 +204,22 @@ class DatabaseMetrics:
 
         return min(np.sum(diff) / np.sum(full), 1.0)
 
+    def __plot_convex_hull_for_fill_rate(self, ax, p, radius, zorder):
+        ax.clear()
+        ax.axis("off")
+        ax.add_patch(p)
+        ax.plot(
+            self.points[:, 0], self.points[:, 1], "wo", markersize=radius, zorder=zorder
+        )
+
     @staticmethod
-    def __remove_alpha_channel(array):
-        return np.delete(array, 3, 2)
+    def __canvas_to_rgb(canvas):
+        context_usetex = rcParams["text.usetex"]
+        rc("text", usetex=False)
+        canvas.draw()
+        rc("text", usetex=context_usetex)
+        array = np.array(canvas.renderer.buffer_rgba()).copy()
+        return np.delete(array, 3, 2)  # Remove alpha
 
     @describe_figure("delaunay.png", "Colorfulness", "Spatial Information")
     def __plot_delaunay(self) -> None:

@@ -24,6 +24,11 @@ class TestDatabaseMetrics(TestCase):
         self.assertGreaterEqual(area, 0.0)
         self.assertLessEqual(area, 1.0)
 
+    def test_should_calculate_fill_rate(self):
+        fill_rate = self.dm.calculate_fill_rate_fixed_radius_area()
+        self.assertGreaterEqual(fill_rate, 0.0)
+        self.assertLessEqual(fill_rate, 1.0)
+
     def test_should_raise_on_missing_dir(self):
         with self.assertRaises(DatabaseMetricsError):
             DatabaseMetrics("missing", None, (100, 100), "test_db")

@@ -14,7 +14,7 @@ jobs:
       - python/save-cache
       - run:
           command: |
-            interrogate -v app
+            interrogate -v -M -p -r 'Test*' app
           name: Run docstring analysis
       - run:
           command: |

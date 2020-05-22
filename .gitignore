@@ -1,5 +1,7 @@
 /output/*
 !/output/.gitkeep
+!/output/convex_hull_montage.png
+!/output/delaunay_montage.png
 
 .idea
 

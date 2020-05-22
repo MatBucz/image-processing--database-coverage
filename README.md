@@ -83,3 +83,15 @@ Bibtex:
   year={2018}
 }
 ```
+
+## Output
+
+This tool saves results in separate figures, which can be montaged into following:
+
+Exemplary convex hulls for databases:
+
+![Convex hull](/output/convex_hull_montage.png "Convex hull")
+
+Exemplary delaunay traingulations for databases:
+
+![Delaunay traingulation](/output/delaunay_montage.png "Delaunay triangulation")

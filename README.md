@@ -14,11 +14,13 @@ should have their own directory:
 parent_dir
 │
 └───detabase 1
+│   │   .info.yaml
 │   │   image1.png
 │   │   image2.png
 │   │   ...
 │
 └───database 2
+│   │   .info.yaml
 │   │   imageA.png
 │   │   imageB.png
 │   │   ...
@@ -26,10 +28,22 @@ parent_dir
 │   ...
 │
 └───database N
+    │   .info.yaml
     │   imageX.png
     │   imageY.png
     │   imageZ.png
     │   ...
+```
+
+Moreover `.info.yaml` file might contain additional information about databases,
+which will be plotted on separate figures. The structure of the yaml file is as follows:
+```yaml
+database:
+  year: 2006
+  distorted_images: 500
+  distortion_types: 4
+  distortion_levels: 6
+  applied_distortion: 1
 ```
 
 ## Usage

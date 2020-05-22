@@ -1,0 +1,6 @@
+database:
+  year: 2010
+  distorted_images: 1000
+  distortion_types: 4
+  distortion_levels: 4
+  applied_distortion: 2

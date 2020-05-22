@@ -43,6 +43,11 @@ class DatabaseAnalyze:
                 "Database",
                 "Area",
                 "Fill rate",
+                "Distorted images",
+                "Distortion types",
+                "Distortion levels",
+                "Applied distortions",
+                "Year",
             ]
         )
 
@@ -74,10 +79,33 @@ class DatabaseAnalyze:
                 self.parent_dir + db, self.output, (self.max_si, self.max_cf), db
             )
             self.db_metric[db].plot_all()
+        self.__parse_info()
         self.__fill_rate_factor()
         self.__uniformity()
         self.__relative_ranges()
         self.__convex_hull_area()
+
+    def __parse_info(self):
+        for db in self.dc:
+            info = self.db_metric[db].info()
+            self.df = self.df.append(
+                {
+                    "Year": info["year"],
+                    "Distorted images": info["distorted_images"],
+                    "Distortion types": info["distortion_types"],
+                    "Distortion levels": info["distortion_levels"],
+                    "Applied distortions": info["applied_distortion"],
+                    "Database": db,
+                },
+                ignore_index=True,
+            )
+        for metric in (
+            "Distorted images",
+            "Distortion types",
+            "Distortion levels",
+            "Applied distortions",
+        ):
+            self.__single_bar(metric, False)
 
     def __relative_ranges(self):
         for db in self.dc:
@@ -120,11 +148,12 @@ class DatabaseAnalyze:
             )
         self.__double_bar("Uniformity")
 
-    def __single_bar(self, y):
+    def __single_bar(self, y, unit_scale: bool = True):
         plt.clf()
         self.df = self.df.sort_values(by=y, ascending=False)
         ax = sns.barplot(x="Database", y=y, data=self.df)
-        plt.ylim(0, 1)
+        if unit_scale:
+            plt.ylim(0, 1)
         plt.ylabel(None)
         plt.title(y)
         if self.output is not None:

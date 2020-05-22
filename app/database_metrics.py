@@ -1,10 +1,11 @@
 """Metrics processing for single DB"""
 import math
 import os
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import seaborn as sns
+import yaml
 from app.image_collection import ImageCollection, ImageIteratorInputError
 from app.image_metrics import ImageMetrics
 from matplotlib import pyplot as plt
@@ -70,6 +71,7 @@ class DatabaseMetrics:
             self.it = ImageCollection(directory)
         except ImageIteratorInputError as err:
             raise DatabaseMetricsError(f"Error during creating ImageCollection '{err}'")
+        self.directory = directory
         self.output_dir = output_dir
         self.label = label
         self.si: List[float] = list()
@@ -128,6 +130,14 @@ class DatabaseMetrics:
         self.__plot_convex_hull()
         self.__plot_fixed_radius()
         self.__plot_delaunay()
+
+    def info(self) -> Dict[str, int]:
+        with open(f"{self.directory}/.info.yaml", "r") as f:
+            try:
+                database_info = yaml.safe_load(f)
+                return database_info["database"]
+            except yaml.YAMLError:
+                raise DatabaseMetricsError("Info could not be loaded")
 
     def __calculate_si_cf(self) -> Tuple[np.ndarray, np.ndarray]:
         """
@@ -218,7 +228,7 @@ class DatabaseMetrics:
     def __canvas_to_rgb(canvas):
         canvas.draw()
         array = np.array(canvas.renderer.buffer_rgba()).copy()
-        return np.delete(array, 3, 2)  # Remove alpha
+        return np.delete(array, 3, 2)  # Remove alpha channel
 
     @describe_figure("delaunay.png", "Colorfulness", "Spatial Information")
     def __plot_delaunay(self) -> None:

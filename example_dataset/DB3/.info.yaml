@@ -1,0 +1,6 @@
+database:
+  year: 2019
+  distorted_images: 5000
+  distortion_types: 6
+  distortion_levels: 2
+  applied_distortion: 3

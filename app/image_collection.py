@@ -34,6 +34,8 @@ class ImageIterator:
 class ImageCollection:
     """Collection of images in the database based on iterator"""
 
+    IMAGE_EXTENSIONS = (".png", ".bmp", ".jpeg", ".jpg", ".gif", ".tiff")
+
     def __init__(self, directory: str) -> None:
         """
         Create image collection
@@ -43,7 +45,11 @@ class ImageCollection:
             raise ImageIteratorInputError(
                 f"Provided path is not directory '{directory}'"
             )
-        self.files = [f for f in listdir(directory) if isfile(join(directory, f))]
+        self.files = [
+            f
+            for f in listdir(directory)
+            if isfile(join(directory, f)) and f.endswith(self.IMAGE_EXTENSIONS)
+        ]
         if not len(self.files):
             raise ImageIteratorInputError(
                 f"Provided path does not contain files '{directory}'"

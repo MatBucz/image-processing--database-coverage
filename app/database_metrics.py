@@ -132,12 +132,14 @@ class DatabaseMetrics:
         self.__plot_delaunay()
 
     def info(self) -> Dict[str, int]:
-        with open(f"{self.directory}/.info.yaml", "r") as f:
-            try:
+        try:
+            with open(f"{self.directory}/.info.yaml", "r") as f:
                 database_info = yaml.safe_load(f)
                 return database_info["database"]
-            except yaml.YAMLError:
-                raise DatabaseMetricsError("Info could not be loaded")
+        except FileNotFoundError as err:
+            raise DatabaseMetricsError(f"File not found: '{err}'")
+        except yaml.YAMLError as err:
+            raise DatabaseMetricsError(f"yaml could not be parsed: '{err}'")
 
     def __calculate_si_cf(self) -> Tuple[np.ndarray, np.ndarray]:
         """

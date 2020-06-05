@@ -2,6 +2,7 @@
 
 from os import listdir
 from os.path import isdir, join
+from typing import List
 
 
 class DatabaseIteratorInputError(Exception):
@@ -55,3 +56,10 @@ class DatabaseCollection:
         :return: Database iterator
         """
         return DatabaseIterator(self)
+
+    def __len__(self) -> int:
+        return len(self.dirs)
+
+    @property
+    def directories(self) -> List[str]:
+        return self.dirs

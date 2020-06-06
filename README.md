@@ -9,12 +9,6 @@
 |                            | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MatBucz_image-processing--database-coverage&metric=alert_status)](https://sonarcloud.io/dashboard?id=MatBucz_image-processing--database-coverage)       |
 | **Code Style**             | [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)                                                                                                                         |
 
-
-
-
-
-
-
 This project provides set of tools allowing to analyze coverage of the image database.
 
 It calculates set of metrics, which allow to compare how wide range of images the database covers.

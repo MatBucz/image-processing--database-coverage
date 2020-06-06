@@ -29,6 +29,10 @@ class TestDatabaseMetrics(TestCase):
         self.assertGreaterEqual(fill_rate, 0.0)
         self.assertLessEqual(fill_rate, 1.0)
 
+    def test_should_get_info(self):
+        db_info = self.dm.info()
+        self.assertIsInstance(db_info, dict)
+
     def test_should_raise_on_missing_dir(self):
         with self.assertRaises(DatabaseMetricsError):
             DatabaseMetrics("missing", None, (100, 100), "test_db")

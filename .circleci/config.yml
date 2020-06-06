@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   python: circleci/python@0.3.0
+  coveralls: coveralls/coveralls@1.0.6
 
 jobs:
   build-and-test:
@@ -21,6 +22,7 @@ jobs:
             coverage run --source app -m pytest tests
             coverage report --skip-empty --fail-under=50
           name: Run tests
+      - coveralls/upload
 
 workflows:
   main:

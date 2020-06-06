@@ -28,6 +28,13 @@ class DatabaseIterator:
             return result
         raise StopIteration
 
+    def __iter__(self):
+        """
+        Iterator
+        :return: iterator
+        """
+        return self
+
 
 class DatabaseCollection:
     """Collection of the databases based on iterator"""

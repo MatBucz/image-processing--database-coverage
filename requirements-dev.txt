@@ -7,3 +7,4 @@ pre-commit>=2.4.0
 isort>=4.3.21
 flake8>=3.8.1
 flake8-mypy>=17.8.0
+coveralls>=2.0.0

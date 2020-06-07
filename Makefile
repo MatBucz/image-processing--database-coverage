@@ -8,7 +8,6 @@ test:
 	coverage run  --source app -m pytest tests
 	coverage report --skip-empty --fail-under=50
 	coverage xml
-
 montage:
 	montage  -geometry +1+1 -tile 2x2 output/*_delaunay.png output/delaunay_montage.png
 	montage  -geometry +1+1 -tile 2x2 output/*_si_cf_plane.png output/si_cf_plane_montage.png

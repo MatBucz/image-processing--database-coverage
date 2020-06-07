@@ -13,6 +13,8 @@ from matplotlib import pyplot as plt
 from matplotlib import rc
 from scipy.stats import entropy
 
+FIG_SIZE = (int(os.getenv("BAR_XSIZE", 10)), int(os.getenv("BAR_YSIZE", 6)))
+
 
 class SingleMetrics(Enum):
     """
@@ -193,32 +195,26 @@ class DatabaseAnalyze:
         Plots bar for given metric
         :param y: metric
         """
-        plt.clf()
+        fig, ax = plt.subplots(figsize=FIG_SIZE)
         df = self.df_single.sort_values(by=y, ascending=False)
         ax = sns.barplot(
-            x=df.index, y=y, data=df, palette=df[SingleMetrics.PALETTE.value]
+            x=df.index, y=y, data=df, palette=df[SingleMetrics.PALETTE.value], ax=ax
         )
         if unit_scale:
-            plt.ylim(0, 1)
-        plt.ylabel(None)
-        plt.title(y)
+            ax.set(ylim=[0, 1])
+        ax.set(ylabel=None, title=y)
         if self.output is not None:
-            fig = ax.get_figure()
-            fig.savefig(self.output + f"{y}.png")
+            fig.savefig(self.output + f"bar_{y.lower().replace(' ', '_')}.png")
 
     def __double_bar(self, y):
         """
         Plots double bar for given metric with SI/CF split
         :param y: metric
         """
-        plt.clf()
-        plt.cla()
+        fig, ax = plt.subplots(figsize=FIG_SIZE)
         df = self.df_double.sort_values(by=y, ascending=False).reset_index()
         df = df.rename(columns={"level_0": "DB", "level_1": "Metric"})
-        ax = sns.barplot(x="DB", y=y, hue="Metric", data=df)
-        plt.ylim(0, 1)
-        plt.ylabel(None)
-        plt.title(y)
+        ax = sns.barplot(x="DB", y=y, hue="Metric", data=df, ax=ax)
+        ax.set(ylim=(0, 1), ylabel=None, title=y)
         if self.output is not None:
-            fig = ax.get_figure()
-            fig.savefig(self.output + f"{y}.png")
+            fig.savefig(self.output + f"bar_{y.lower().replace(' ', '_')}.png")

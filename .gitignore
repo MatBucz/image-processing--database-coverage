@@ -2,6 +2,8 @@
 !/output/.gitkeep
 !/output/convex_hull_montage.png
 !/output/delaunay_montage.png
+!/output/bar_distorted_images.png
+!/output/bar_relative_ranges.png
 
 .idea
 

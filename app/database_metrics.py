@@ -29,15 +29,17 @@ def describe_figure(filename, xlabel: str, ylabel: str, title: str = None):
     def decorator(func):
         def wrapper(obj):
             if obj.output_dir is not None:
-                plt.figure(figsize=FIG_SIZE)
-                func(obj)
-                plt.title(title if title is not None else obj.label)
-                plt.xlabel(xlabel)
-                plt.ylabel(ylabel)
-                plt.xlim(0, XLIM)
-                plt.ylim(0, YLIM)
+                fig, ax = plt.subplots(figsize=FIG_SIZE)
+                func(obj, ax)
+                ax_title = title if title is not None else obj.label
+                ax.set(
+                    xlim=[0, XLIM],
+                    ylim=[0, YLIM],
+                    xlabel=xlabel,
+                    ylabel=ylabel,
+                    title=ax_title,
+                )
                 plt.tight_layout()
-
                 plt.savefig(
                     f"{obj.output_dir}{obj.label}_{filename}", bbox_inches="tight"
                 )
@@ -158,25 +160,25 @@ class DatabaseMetrics:
         )
 
     @describe_figure("si_cf_plane.png", "Colorfulness", "Spatial Information")
-    def __plot_si_cf_plane(self) -> None:
+    def __plot_si_cf_plane(self, ax=None) -> None:
         """Plots Spatial Information x Colorfulness plane"""
-        sns.scatterplot(self.cf, self.si)
+        sns.scatterplot(self.cf, self.si, ax=ax)
 
     @describe_figure("convex_hull.png", "Colorfulness", "Spatial Information")
-    def __plot_convex_hull(self) -> None:
+    def __plot_convex_hull(self, ax=None) -> None:
         """Plots Convex Hull for SIxCF plane"""
-        plt.plot(self.points[:, 0], self.points[:, 1], "o")
+        ax.plot(self.points[:, 0], self.points[:, 1], "o")
         for simplex in self.hull.simplices:
-            plt.plot(self.points[simplex, 0], self.points[simplex, 1], "k-")
+            ax.plot(self.points[simplex, 0], self.points[simplex, 1], "k-")
 
     @describe_figure("fixed_radius.png", "Colorfulness", "Spatial Information")
-    def __plot_fixed_radius(self, radius: float = 60) -> None:
+    def __plot_fixed_radius(self, ax=None, radius: float = 60) -> None:
         """Plots Convex Hull with fixed radius method for SIxCF plane"""
         radius *= 72.0 / plt.gcf().dpi
-        plt.plot(self.points[:, 0], self.points[:, 1], "o", markersize=radius)
-        plt.plot(self.points[:, 0], self.points[:, 1], "yx")
+        ax.plot(self.points[:, 0], self.points[:, 1], "o", markersize=radius)
+        ax.plot(self.points[:, 0], self.points[:, 1], "yx")
         for simplex in self.hull.simplices:
-            plt.plot(self.points[simplex, 0], self.points[simplex, 1], "k-")
+            ax.plot(self.points[simplex, 0], self.points[simplex, 1], "k-")
 
     def calculate_fill_rate_fixed_radius_area(self, radius: float = 60) -> float:
         """
@@ -233,13 +235,13 @@ class DatabaseMetrics:
         return np.delete(array, 3, 2)  # Remove alpha channel
 
     @describe_figure("delaunay.png", "Colorfulness", "Spatial Information")
-    def __plot_delaunay(self) -> None:
+    def __plot_delaunay(self, ax=None) -> None:
         """Plots Delaunay triangulation for SIxCF plane"""
         for simplex in self.hull.simplices:
-            plt.plot(self.points[simplex, 0], self.points[simplex, 1], "r-")
+            ax.plot(self.points[simplex, 0], self.points[simplex, 1], "r-")
 
         tri = Delaunay(self.points)
-        plt.triplot(self.points[:, 0], self.points[:, 1], tri.simplices.copy(), lw=1)
+        ax.triplot(self.points[:, 0], self.points[:, 1], tri.simplices.copy(), lw=1)
 
     def __str__(self) -> str:
         """Returns lists of SI and CF"""

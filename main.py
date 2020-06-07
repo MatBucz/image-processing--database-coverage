@@ -4,8 +4,9 @@ import os
 
 from app.database_analyze import DatabaseAnalyze
 
-logging.basicConfig(level=logging.DEBUG)
-logging.getLogger("matplotlib").setLevel(logging.WARNING)
+LOGGING_LEVEL = int(os.getenv("LOGGING_LEVEL", logging.WARNING))
+
+logging.basicConfig(level=LOGGING_LEVEL)
 
 DB_SRC = os.getenv("DB_SRC", "./example_dataset/")
 OUTPUT = os.getenv("OUTPUT", "./output/")

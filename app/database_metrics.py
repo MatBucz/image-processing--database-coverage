@@ -43,7 +43,7 @@ def describe_figure(filename, xlabel: str, ylabel: str, title: str = None):
                 plt.savefig(
                     f"{obj.output_dir}{obj.label}_{filename}", bbox_inches="tight"
                 )
-                plt.close()
+            plt.close(fig)
 
         return wrapper
 

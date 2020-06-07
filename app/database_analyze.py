@@ -185,7 +185,6 @@ class DatabaseAnalyze:
         for db in self.dc:
             si_uni = entropy(self.db_metric[db].si, base=10)
             cf_uni = entropy(self.db_metric[db].cf, base=10)
-            print(self.df_double)
             self.df_double.at[(db, "SI"), DoubleMetrics.UNIFORMITY.value] = si_uni
             self.df_double.at[(db, "CF"), DoubleMetrics.UNIFORMITY.value] = cf_uni
         self.__double_bar(DoubleMetrics.UNIFORMITY.value)

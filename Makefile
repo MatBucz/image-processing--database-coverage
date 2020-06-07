@@ -7,7 +7,7 @@ run:
 test:
 	coverage run  --source app -m pytest tests
 	coverage report --skip-empty --fail-under=50
-	coverage xml
+	coverage xml -o coverage-reports/coverage-app.xml
 
 montage:
 	montage  -geometry +1+1 -tile 2x2 output/*_delaunay.png output/delaunay_montage.png

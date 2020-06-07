@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   python: circleci/python@0.3.0
+  sonarcloud: sonarsource/sonarcloud@1.0.1
 
 jobs:
   build-and-test:
@@ -22,8 +23,9 @@ jobs:
             coverage report --skip-empty --fail-under=50
             coveralls
           name: Run tests
-
+      - sonarcloud/scan
 workflows:
   main:
     jobs:
-      - build-and-test
+      - build-and-test:
+          context: SonarCloud

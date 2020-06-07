@@ -34,11 +34,3 @@ repos:
     hooks:
     -   id: mypy
         args: [--config-file, 'mypy.ini']
-
-  - repo: local
-    hooks:
-      - id: tests
-        name: run tests
-        language: system
-        entry: make
-        args: ['test']

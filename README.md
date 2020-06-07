@@ -95,3 +95,11 @@ Exemplary convex hulls for databases:
 Exemplary delaunay traingulations for databases:
 
 ![Delaunay traingulation](/output/delaunay_montage.png "Delaunay triangulation")
+
+Exemplary number od distorted images
+
+![Distorted_images](/output/bar_distorted_images.png "Distorted images")
+
+Exemplary bar plot of relative ranges
+
+![Relative_ranges](/output/bar_relative_ranges.png "Relative ranges")

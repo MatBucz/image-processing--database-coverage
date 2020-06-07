@@ -21,6 +21,7 @@ jobs:
           command: |
             coverage run --source app -m pytest tests
             coverage report --skip-empty --fail-under=50
+            coverage xml
             coveralls
           name: Run tests
       - sonarcloud/scan

@@ -1,7 +1,13 @@
 # Image database coverage
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MatBucz_image-processing--database-coverage&metric=alert_status)](https://sonarcloud.io/dashboard?id=MatBucz_image-processing--database-coverage)
-[![CircleCI](https://circleci.com/gh/MatBucz/image-processing--database-coverage.svg?style=shield)](https://circleci.com/gh/MatBucz/image-processing--database-coverage)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
+| Metric                     |                                                                                                                                                                                                                                          |
+| :------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Continuous Integration** | [![CircleCI](https://circleci.com/gh/MatBucz/image-processing--database-coverage.svg?style=shield)](https://circleci.com/gh/MatBucz/image-processing--database-coverage)                                                                 |
+| **Coverage**               | [![Coverage Status](https://coveralls.io/repos/github/MatBucz/image-processing--database-coverage/badge.svg?branch=master)](https://coveralls.io/github/MatBucz/image-processing--database-coverage?branch=master)                       |
+| **Code Quality**           | [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/MatBucz/image-processing--database-coverage.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MatBucz/image-processing--database-coverage/context:python)   |
+|                            | [![Total alerts](https://img.shields.io/lgtm/alerts/g/MatBucz/image-processing--database-coverage.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/MatBucz/image-processing--database-coverage/alerts/)                          |
+|                            | [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=MatBucz_image-processing--database-coverage&metric=alert_status)](https://sonarcloud.io/dashboard?id=MatBucz_image-processing--database-coverage)       |
+| **Code Style**             | [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)                                                                                                                         |
 
 This project provides set of tools allowing to analyze coverage of the image database.
 

@@ -30,6 +30,13 @@ class ImageIterator:
             return result
         raise StopIteration
 
+    def __iter__(self):
+        """
+        Iterator
+        :return: iterator
+        """
+        return self
+
 
 class ImageCollection:
     """Collection of images in the database based on iterator"""

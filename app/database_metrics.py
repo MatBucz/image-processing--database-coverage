@@ -28,9 +28,9 @@ def describe_figure(filename, xlabel: str, ylabel: str, title: str = None):
 
     def decorator(func):
         def wrapper(obj):
+            fig, ax = plt.subplots(figsize=FIG_SIZE)
+            func(obj, ax)
             if obj.output_dir is not None:
-                fig, ax = plt.subplots(figsize=FIG_SIZE)
-                func(obj, ax)
                 ax_title = title if title is not None else obj.label
                 ax.set(
                     xlim=[0, XLIM],
